@@ -179,3 +179,9 @@ CI builds the frontend/container and tests the PDF engine, offline operation, co
 Pushing a semantic-version tag such as `v0.1.0` publishes versioned AMD64/ARM64 images to GHCR after validation passes; the maintainer can also run the publishing workflow manually (which publishes `latest`). GitHub Actions authenticate with `GITHUB_TOKEN`; do not put registry tokens in source files. The current package is **Public**. For a new package or fork, verify its visibility in package settings and change it to Public if needed for anonymous pulls.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [THIRD_PARTY.md](THIRD_PARTY.md). Licensed under **AGPL-3.0-only**. PyMuPDF/MuPDF and other dependencies retain their own licenses and notices.
+
+### Optional Docker Hub publishing (maintainers)
+
+The publishing workflow can also mirror the validated AMD64/ARM64 image to Docker Hub. Create a public `templatecraft-studio` repository in your Docker Hub namespace, set the GitHub Actions repository variable `DOCKERHUB_USERNAME` to your Docker Hub login username, and add a repository secret `DOCKERHUB_TOKEN` containing a Docker Hub access token with write permission. For an organization repository, also set `DOCKERHUB_NAMESPACE` to the organization name and ensure the login has write access there. Keep the token out of source files and chat.
+
+When the variable is configured, successful GHCR publication is followed by a Docker Hub mirror using the published image digest, without rebuilding. Version-tag runs mirror the release, major/minor and `latest` tags; manual runs mirror `latest`. Without the variable, the Docker Hub job is skipped. Use `<namespace>/templatecraft-studio:latest` only after its public publication has been verified.
