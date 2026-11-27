@@ -1,0 +1,18 @@
+{
+  "full_name": "Alex Morgan",
+  "reference": "DEMO-001",
+  "email": "alex@example.com",
+  "phone": "+1 202 555 0142",
+  "date": "2026-11-26",
+  "time": "10:30",
+  "address": "100 Example Avenue, Sample City",
+  "notes": "Please update my contact details.",
+  "consent": "Yes",
+  "applicant_signature": "",
+  "reviewer_name": "Sam Taylor",
+  "review_reference": "REVIEW-001",
+  "review_notes": "Sample review complete.",
+  "confirmed": "Yes",
+  "reviewer_signature": "",
+  "demo_stamp": ""
+}
