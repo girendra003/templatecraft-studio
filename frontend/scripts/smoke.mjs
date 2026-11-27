@@ -14,6 +14,8 @@ const page = await browser.newPage();
 await page.setViewport({ width: 1728, height: 1050, deviceScaleFactor: 1 });
 const failures = [];
 page.on('pageerror', (error) => failures.push(`Browser error: ${error.message}`));
+const appOrigin = new URL(process.env.BASE_URL || 'http://127.0.0.1:8010').origin;
+page.on('request', (request) => { if (/^https?:/.test(request.url()) && new URL(request.url()).origin !== appOrigin) failures.push(`Unexpected external runtime request: ${new URL(request.url()).origin}`); });
 const check = (condition, message) => { if (!condition) failures.push(message); };
 const buttonByText = async (text) => {
   const buttons = await page.$$('button');

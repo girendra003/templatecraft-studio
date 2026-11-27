@@ -35,7 +35,9 @@ from app.engine import (
 app = FastAPI(
     title="TemplateCraft Studio",
     description="Automated PDF Template Cleaner, Field Extractor, AcroForm Generator, Signzy Schema Exporter & Stamp Burner",
-    version="0.1.0"
+    version="0.1.0",
+    docs_url=None,
+    redoc_url=None,
 )
 
 app.add_middleware(
@@ -94,6 +96,18 @@ class ReplaceFieldsRequest(BaseModel):
     fields: List[Dict[str, Any]]
     static_texts: Optional[List[Dict[str, Any]]] = None
     stamp_placements: Optional[List[Dict[str, Any]]] = None
+
+
+@app.middleware("http")
+async def local_resources_only(request, call_next):
+    response = await call_next(request)
+    if "text/html" in response.headers.get("content-type", ""):
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; "
+            "object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self'"
+        )
+    return response
 
 
 @app.get("/api/health")

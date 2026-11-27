@@ -30,6 +30,8 @@ jobs:
           python tests/test_stamp_editor.py
       - name: Build release image
         run: docker build -t templatecraft-ci .
+      - name: Verify offline operation
+        run: docker run --rm --network none --read-only --tmpfs /tmp:size=128m,mode=1777 --mount "type=bind,source=$PWD/tests,target=/app/tests,readonly" --entrypoint python templatecraft-ci tests/test_offline.py
       - name: Start read-only container
         run: docker run -d --name templatecraft-ci --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true -p 127.0.0.1:8020:8008 templatecraft-ci
       - name: Wait for readiness

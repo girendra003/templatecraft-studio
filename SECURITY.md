@@ -7,3 +7,5 @@ The Docker quick start binds only to localhost and runs as a non-root user. For 
 Uploaded files are not intentionally persisted by the API. Avoid uploading real confidential files to untrusted instances. The fictional sample contains no customer data. This editor does not validate cryptographic signatures, and modifying a signed PDF can invalidate signatures.
 
 To report a vulnerability privately, use the repository's Security advisory reporting feature if available. Do not include secrets or confidential documents in public issues.
+
+The built application has no required external runtime services. Its frontend resource policy allows same-origin resources only (plus local data/blob images), and CDN-backed API documentation pages are disabled. The API schema remains available at `/openapi.json`. Optional source links and build/publish tooling require internet when used.

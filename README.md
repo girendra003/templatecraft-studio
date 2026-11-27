@@ -8,6 +8,15 @@ Turn a PDF into an editable template, arrange fields across pages, update docume
 
 ![TemplateCraft Studio landing page](docs/images/landing.png)
 
+## Free and self-contained
+
+- No paid APIs, subscription, AI service, cloud database, analytics or API keys are required.
+- PDF processing runs on your own machine/container. UI scripts, icons, styles, fonts and sample assets are served locally; no CDN is required.
+- After downloading the built image, the application can run without internet access. Browser network connections are restricted to the app's own origin by its content-security policy.
+- Source and bundled artwork are available under AGPL-3.0-only. The app still uses open-source libraries (React, FastAPI, PyMuPDF and others), bundled inside Docker. See [THIRD_PARTY.md](THIRD_PARTY.md).
+- Building from source or initially pulling the image requires internet access unless all required packages/base images are already cached. GitHub/Actions/GHCR are publishing tools, not application runtime requirements. The Source link opens GitHub only when you choose to click it.
+- There is no application usage fee. Your chosen hardware, hosting, container platform or CI provider may have its own costs and terms; Docker Engine on Linux is an option for running locally.
+
 ## Run with Docker
 
 No Python or Node.js installation is needed; install Docker, then run:
