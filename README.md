@@ -17,74 +17,124 @@ Turn a PDF into an editable template, arrange fields across pages, update docume
 - Building from source or initially pulling the image requires internet access unless all required packages/base images are already cached. GitHub/Actions/GHCR are publishing tools, not application runtime requirements. The Source link opens GitHub only when you choose to click it.
 - There is no application usage fee. Your chosen hardware, hosting, container platform or CI provider may have its own costs and terms; Docker Engine on Linux is an option for running locally.
 
-## Run with Docker
+## Install and run with Docker
 
-No Python or Node.js installation is needed. Install and start Docker Engine or Docker Desktop (using Linux containers), then run this in your computer's terminal, outside any container. The public image requires no GitHub account or registry login.
+You only need Docker and a browser. No Python, Node.js, source-code download or registry login is needed to run the public images.
 
-This single-line command works in Bash, Zsh, PowerShell and Command Prompt:
+### 1. Install and start Docker
 
-```text
-docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true ghcr.io/girendra003/templatecraft-studio:latest
-```
+| Your system | Install | Terminal to use |
+| --- | --- | --- |
+| Windows | [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/). Complete its WSL 2 setup and use **Linux containers**. | **PowerShell** or Command Prompt |
+| macOS (Apple Silicon or Intel) | [Docker Desktop for Mac](https://docs.docker.com/desktop/setup/install/mac-install/). Choose the installer for your chip and start Docker Desktop. | **Terminal** (Zsh or Bash) |
+| Linux (AMD64 or ARM64) | [Docker Engine](https://docs.docker.com/engine/install/) for your distribution; start the Docker service and configure access for your user. | **Terminal** (Bash or Zsh) |
 
-For Bash/Zsh, the same command can be split across lines:
-
-```bash
-docker run --detach \
-  --name templatecraft-studio \
-  --publish 127.0.0.1:8008:8008 \
-  --read-only \
-  --tmpfs /tmp:size=128m,mode=1777 \
-  --cap-drop ALL \
-  --security-opt no-new-privileges:true \
-  ghcr.io/girendra003/templatecraft-studio:latest
-```
-
-Open **http://localhost:8008**, choose **Try sample** or upload your PDF.
-
-```bash
-# Follow logs
-docker logs --follow templatecraft-studio
-
-# Stop and start again
-docker stop templatecraft-studio
-docker start templatecraft-studio
-
-# Check health from the host terminal (Bash/Zsh)
-curl --fail http://localhost:8008/api/health
-```
-
-In PowerShell, check health with `Invoke-RestMethod http://localhost:8008/api/health`. The container does not include `curl`; to check from inside it, use Python:
+Run this to confirm Docker is ready:
 
 ```text
-docker exec templatecraft-studio python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8008/api/health').read().decode())"
+docker info
 ```
 
-The image supports Linux AMD64 and ARM64, including Docker Desktop on Apple Silicon. Use `:0.1.0` instead of `:latest` to select the first release. To use another local port, change the left side of the mapping, for example `127.0.0.1:8080:8008`.
+Run all commands below in your computer's terminal, **outside a container**. On Windows, use PowerShell for these instructions; Git Bash can rewrite Linux paths such as `/tmp`. All Docker commands below are single lines and work in PowerShell, Command Prompt, Bash and Zsh. Copy only the code, without Markdown links or extra backslashes.
 
-The address is local to the Docker host. If Docker runs on another computer or a remote Docker context, `localhost` in your browser refers to your own computer instead.
+### 2. Choose one image source
 
-**Save changes updates the active in-memory session. Download your work to keep it.** Sessions do not survive container/server restarts. This is a local/trusted-environment tool, with no authentication or account isolation; do not expose its port directly to the internet. See [deployment notes](SECURITY.md).
+Both sources serve the same application with Linux AMD64 and ARM64 support. Docker selects the architecture automatically. Choose **Docker Hub** or **GHCR**, not both.
 
-### Docker troubleshooting
+| Source | Image | When to choose it |
+| --- | --- | --- |
+| [Docker Hub](https://hub.docker.com/r/girendra003/templatecraft-studio) | `girendra003/templatecraft-studio:latest` | Start here; also useful if your network denies GHCR pulls. |
+| [GitHub Container Registry (GHCR)](https://github.com/girendra003/templatecraft-studio/pkgs/container/templatecraft-studio) | `ghcr.io/girendra003/templatecraft-studio:latest` | Use if you prefer GitHub's registry or cannot reach Docker Hub. |
 
-The same release is also public on **Docker Hub**, which provides another download source if your network cannot pull from GHCR:
+**Option A — Docker Hub:** run each line separately:
 
 ```text
 docker pull girendra003/templatecraft-studio:latest
 docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true girendra003/templatecraft-studio:latest
 ```
 
-Both registries provide `latest`, `0.1` and `0.1.0` for the first release, with Linux AMD64 and ARM64 support. Open `http://localhost:8008` after startup. If a container with this name already exists, start that container or choose a different name before creating another.
+**Option B — GHCR:** run each line separately:
 
-| Message or symptom | What to check |
+```text
+docker pull ghcr.io/girendra003/templatecraft-studio:latest
+docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true ghcr.io/girendra003/templatecraft-studio:latest
+```
+
+`docker pull` downloads the image; `docker run` creates and starts the app in the background. The run command restricts the container's permissions and provides temporary writable space at `/tmp`.
+
+### 3. Open the app
+
+Wait for startup, then open **http://localhost:8008** in your browser. Choose **Try sample** or upload your PDF.
+
+The port is available only on the computer running Docker. If Docker uses a remote host, your browser's `localhost` points to your own computer instead. To use port 8080, change `127.0.0.1:8008:8008` to `127.0.0.1:8080:8008` and open `http://localhost:8080`.
+
+**Download your work before stopping or restarting the app.** Save changes updates only the active in-memory session; sessions do not survive container/server restarts. No volume is needed because persistent sessions are not implemented. This tool has no authentication or account isolation; use it locally or in a trusted environment. See [deployment notes](SECURITY.md).
+
+### Everyday commands
+
+These commands are the same for both registries and all systems:
+
+| What you want to do | Command |
 | --- | --- |
-| `permission denied` connecting to the Docker socket | Run `docker info` in the host terminal. Fix access to your Docker installation using its platform instructions; this is separate from GHCR image access. |
-| Cannot connect to the Docker daemon | Start Docker Desktop or the Docker Engine service and confirm `docker info` succeeds. |
-| `denied` or `unauthorized` pulling from GHCR | Confirm the exact image name above with `docker pull ghcr.io/girendra003/templatecraft-studio:latest`. It is public. If you have stale GHCR credentials, `docker logout ghcr.io` clears them for this OS user; this also signs out other GHCR pulls using those credentials. Retry and capture the full error if it persists. |
-| Container name already in use | Use `docker start templatecraft-studio` for the existing container, or use a different `--name` for a new one. |
-| Port already allocated | Choose another host port, such as `127.0.0.1:8080:8008`, and open `http://localhost:8080`. |
+| See running containers | `docker ps` |
+| See stopped containers too | `docker ps -a` |
+| Follow the app logs | `docker logs --follow templatecraft-studio` (Ctrl+C stops following logs) |
+| Stop the app | `docker stop templatecraft-studio` |
+| Start an existing stopped app | `docker start templatecraft-studio` |
+| Restart the app (clears sessions) | `docker restart templatecraft-studio` |
+| Remove a stopped app container | `docker rm templatecraft-studio` |
+
+Run `docker run` only when creating a container. Use `docker start` when the named container already exists.
+
+To check health in **Windows PowerShell**:
+
+```powershell
+Invoke-RestMethod http://localhost:8008/api/health
+```
+
+In **macOS/Linux Terminal**:
+
+```bash
+curl --fail http://localhost:8008/api/health
+```
+
+A healthy app returns `{"status":"ok"}`. The image itself does not include `curl`.
+
+### Update to the latest version
+
+Changes merged into `main` automatically publish `latest` to both registries after validation passes. **Existing containers do not update automatically.** Download your work first, then use the commands for your chosen registry below. Run each line separately and continue only if the preceding command succeeds.
+
+**Docker Hub:**
+
+```text
+docker pull girendra003/templatecraft-studio:latest
+docker stop templatecraft-studio
+docker rm templatecraft-studio
+docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true girendra003/templatecraft-studio:latest
+```
+
+**GHCR:**
+
+```text
+docker pull ghcr.io/girendra003/templatecraft-studio:latest
+docker stop templatecraft-studio
+docker rm templatecraft-studio
+docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true ghcr.io/girendra003/templatecraft-studio:latest
+```
+
+If you previously changed the name or port, use those same settings when recreating the container. To choose the first release instead of the changing `latest` tag, replace `:latest` with `:0.1.0` in both the pull and run commands. `:0.1` follows releases in the 0.1 series.
+
+### Troubleshooting
+
+| Message or symptom | What to do |
+| --- | --- |
+| Cannot connect to the Docker daemon | Start Docker Desktop or the Docker Engine service; confirm `docker info` succeeds. |
+| `permission denied` accessing Docker, or a Windows named-pipe error | Check Docker's installation/user permissions using the instructions for your system. This happens before the app starts. |
+| `denied` or `unauthorized` pulling from a registry | Confirm the exact image name above and try the other registry. Both images are public. Check Docker Desktop's proxy/VPN settings if the problem persists; Docker's network settings can differ from your terminal's. |
+| Container name already in use | Run `docker start templatecraft-studio`, or choose another `--name` for a new container. For an update, follow the stop/remove/recreate steps above. |
+| Port already allocated or permission denied binding a port | Use another host port, such as `127.0.0.1:8080:8008`, then open `http://localhost:8080`. |
 | Browser cannot connect | Check `docker ps -a` and `docker logs templatecraft-studio`; wait for startup and confirm your browser is on the Docker host. |
+| Windows reports an incompatible image/platform | Use Docker Desktop's Linux-container engine. This project does not publish native Windows-container images. |
 
 ## Build from source
 
@@ -110,7 +160,7 @@ docker compose pull
 docker compose up --detach --no-build
 ```
 
-To update a container started with `docker run`, download your work first, then stop/remove the old container, pull the new image, and repeat the run command. No volume is needed: the application does not provide persistent session storage.
+The included Compose file uses GHCR. To use Docker Hub instead, change its `image:` value to `girendra003/templatecraft-studio:latest`. To update a Compose deployment, download your work, run `docker compose pull`, then `docker compose up --detach --no-build`.
 
 ## Features
 
@@ -185,14 +235,14 @@ The default template is the bundled sample. Pass `--template` for another AcroFo
 
 CI builds the frontend/container and tests the PDF engine, offline operation, container API and browser workflows. Changes to `main` go through pull requests with passing `test` CI, an up-to-date branch and resolved review conversations. Force pushes and deletion are blocked. Another person's approval is optional so the sole maintainer can merge after CI passes.
 
-Every push or merged pull request to `main` runs validation and then publishes AMD64/ARM64 images with the `latest` tag. With the Docker Hub credentials configured below, the workflow also mirrors the same image to Docker Hub. Feature branches and pull requests only run CI; they do not publish images. Publishing runs are serialized so active uploads are not interrupted.
+Every push or merged pull request to `main` runs validation and then publishes AMD64/ARM64 images with the `latest` tag to GHCR and Docker Hub. Both registries use the same image digest; automatic publishing is configured for this repository. Feature branches and pull requests only run CI; they do not publish images. Publishing runs are serialized so active uploads are not interrupted.
 
 Pushing a semantic-version tag such as `v0.1.1` also publishes release and major/minor tags. The maintainer can run the publishing workflow manually to update `latest` for the selected ref; select `main` for the current main-branch image. GitHub Actions authenticate to GHCR with `GITHUB_TOKEN`; do not put registry tokens in source files. The current package is **Public**. For a new package or fork, verify its visibility in package settings and change it to Public if needed for anonymous pulls.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [THIRD_PARTY.md](THIRD_PARTY.md). Licensed under **AGPL-3.0-only**. PyMuPDF/MuPDF and other dependencies retain their own licenses and notices.
 
-### Optional Docker Hub publishing (maintainers)
+### Registry setup for forks and maintainers
 
 The publishing workflow can also mirror the validated AMD64/ARM64 image to Docker Hub. Create a public `templatecraft-studio` repository in your Docker Hub namespace, set the GitHub Actions repository variable `DOCKERHUB_USERNAME` to your Docker Hub login username, and add a repository secret `DOCKERHUB_TOKEN` containing a Docker Hub access token with write permission. For an organization repository, also set `DOCKERHUB_NAMESPACE` to the organization name and ensure the login has write access there. Keep the token out of source files and chat.
 
-When the variable is configured, successful GHCR publication is followed by a Docker Hub mirror using the published image digest, without rebuilding. Version-tag runs mirror the release, major/minor and `latest` tags; manual runs mirror `latest`. Without the variable, the Docker Hub job is skipped. Use `<namespace>/templatecraft-studio:latest` only after its public publication has been verified.
+Successful GHCR publication is followed by a Docker Hub mirror using the published image digest, without rebuilding. Main-branch and manual runs mirror `latest`; version-tag runs also mirror release and major/minor tags. These credentials are already configured for this repository. Forks must configure their own credentials and change the hard-coded GHCR namespace in the workflow; without `DOCKERHUB_USERNAME`, the Docker Hub job is skipped. Keep the write token valid and replace the Actions secret when rotating it.
