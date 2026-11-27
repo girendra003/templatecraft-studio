@@ -4,7 +4,7 @@
 
 Turn a PDF into an editable template, arrange fields across pages, update document text, place signatures/stamps, preview filled values, and export PDFs or Signzy-compatible JSON.
 
-[Source](https://github.com/girendra003/templatecraft-studio) · [GitHub Container Registry](https://github.com/girendra003/templatecraft-studio/pkgs/container/templatecraft-studio) · [Docker Hub](https://hub.docker.com/r/girendra003/templatecraft-studio) · [AGPL-3.0 license](LICENSE)
+[Live demo](https://templatecraft-studio.onrender.com) · [Source](https://github.com/girendra003/templatecraft-studio) · [GitHub Container Registry](https://github.com/girendra003/templatecraft-studio/pkgs/container/templatecraft-studio) · [Docker Hub](https://hub.docker.com/r/girendra003/templatecraft-studio) · [AGPL-3.0 license](LICENSE)
 
 ![TemplateCraft Studio landing page](docs/images/landing.png)
 
@@ -137,6 +137,8 @@ If you previously changed the name or port, use those same settings when recreat
 | Windows reports an incompatible image/platform | Use Docker Desktop's Linux-container engine. This project does not publish native Windows-container images. |
 
 ## Host the complete app on Render
+
+Try the complete hosted demo at **https://templatecraft-studio.onrender.com**. It runs both the interface and PDF backend. Use the fictional sample or non-sensitive PDFs; run Docker locally for confidential documents. The free instance may need about a minute to wake after inactivity.
 
 [Deploy to Render](https://render.com/deploy?repo=https://github.com/girendra003/templatecraft-studio)
 
