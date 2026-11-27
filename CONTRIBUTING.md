@@ -6,6 +6,8 @@
 4. For UI changes, run the browser scripts with `BASE_URL` pointing at your running server. Set `PUPPETEER_EXECUTABLE_PATH` if Chrome is not at the macOS default path.
 5. Describe the user-facing change and validation in a pull request.
 
+`main` requires a pull request, passing `test` CI, an up-to-date branch and resolved review conversations. Force pushes and branch deletion are blocked. Approving reviews are optional to support solo maintenance; all required checks still apply to the maintainer.
+
 Keep example documents and test data fictional. Do not commit uploaded PDFs, credentials, generated outputs, personal project notes, or build caches. Do not describe support for signed, encrypted or arbitrary-size documents without testing it.
 
 Contributions are provided under the project's AGPL-3.0-only license. Existing dependency licenses remain applicable.
