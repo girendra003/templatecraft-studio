@@ -136,6 +136,16 @@ If you previously changed the name or port, use those same settings when recreat
 | Browser cannot connect | Check `docker ps -a` and `docker logs templatecraft-studio`; wait for startup and confirm your browser is on the Docker host. |
 | Windows reports an incompatible image/platform | Use Docker Desktop's Linux-container engine. This project does not publish native Windows-container images. |
 
+## Host the complete app on Render
+
+[Deploy to Render](https://render.com/deploy?repo=https://github.com/girendra003/templatecraft-studio)
+
+The included [render.yaml](render.yaml) runs the frontend and Python PDF backend together using the existing Dockerfile. Choose the **Free** instance and review the configuration before deploying. It uses port 8008, `/api/health`, one application worker, and the Singapore region. For a connected GitHub repository, automatic deploys wait for checks on `main` to pass.
+
+Render's free web services sleep after 15 minutes without traffic and take about a minute to wake. Sleep, restarts and redeploys clear editing sessions; download your work first. Free usage and resource limits apply. See [Render's current free-plan limits](https://render.com/docs/free).
+
+A public instance is a shared demo with no authentication or account isolation. Use fictional/non-sensitive PDFs; keep confidential documents in your local Docker installation. See [SECURITY.md](SECURITY.md). Netlify static hosting alone cannot run this Python backend.
+
 ## Build from source
 
 ```bash
