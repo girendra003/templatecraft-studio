@@ -11,7 +11,7 @@ Turn a PDF into an editable template, arrange fields across pages, update docume
 ## Free and self-contained
 
 - No paid APIs, subscription, AI service, cloud database, analytics or API keys are required.
-- PDF processing runs on your own machine/container. UI scripts, icons, styles, fonts and sample assets are served locally; no CDN is required.
+- PDF processing runs on your own machine/container. UI scripts, icons, styles and sample assets are served locally; the interface uses system fonts and requires no CDN.
 - After downloading the built image, the application can run without internet access. Browser network connections are restricted to the app's own origin by its content-security policy.
 - Source and bundled artwork are available under AGPL-3.0-only. The app still uses open-source libraries (React, FastAPI, PyMuPDF and others), bundled inside Docker. See [THIRD_PARTY.md](THIRD_PARTY.md).
 - Building from source or initially pulling the image requires internet access unless all required packages/base images are already cached. GitHub/Actions/GHCR are publishing tools, not application runtime requirements. The Source link opens GitHub only when you choose to click it.
@@ -19,7 +19,15 @@ Turn a PDF into an editable template, arrange fields across pages, update docume
 
 ## Run with Docker
 
-No Python or Node.js installation is needed; install Docker, then run:
+No Python or Node.js installation is needed. Install and start Docker Engine or Docker Desktop (using Linux containers), then run this in your computer's terminal, outside any container. The public image requires no GitHub account or registry login.
+
+This single-line command works in Bash, Zsh, PowerShell and Command Prompt:
+
+```text
+docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true ghcr.io/girendra003/templatecraft-studio:latest
+```
+
+For Bash/Zsh, the same command can be split across lines:
 
 ```bash
 docker run --detach \
@@ -42,13 +50,32 @@ docker logs --follow templatecraft-studio
 docker stop templatecraft-studio
 docker start templatecraft-studio
 
-# Check health
-curl http://localhost:8008/api/health
+# Check health from the host terminal (Bash/Zsh)
+curl --fail http://localhost:8008/api/health
+```
+
+In PowerShell, check health with `Invoke-RestMethod http://localhost:8008/api/health`. The container does not include `curl`; to check from inside it, use Python:
+
+```text
+docker exec templatecraft-studio python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8008/api/health').read().decode())"
 ```
 
 The image supports Linux AMD64 and ARM64, including Docker Desktop on Apple Silicon. Use `:0.1.0` instead of `:latest` to select the first release. To use another local port, change the left side of the mapping, for example `127.0.0.1:8080:8008`.
 
+The address is local to the Docker host. If Docker runs on another computer or a remote Docker context, `localhost` in your browser refers to your own computer instead.
+
 **Save changes updates the active in-memory session. Download your work to keep it.** Sessions do not survive container/server restarts. This is a local/trusted-environment tool, with no authentication or account isolation; do not expose its port directly to the internet. See [deployment notes](SECURITY.md).
+
+### Docker troubleshooting
+
+| Message or symptom | What to check |
+| --- | --- |
+| `permission denied` connecting to the Docker socket | Run `docker info` in the host terminal. Fix access to your Docker installation using its platform instructions; this is separate from GHCR image access. |
+| Cannot connect to the Docker daemon | Start Docker Desktop or the Docker Engine service and confirm `docker info` succeeds. |
+| `denied` or `unauthorized` pulling from GHCR | Confirm the exact image name above with `docker pull ghcr.io/girendra003/templatecraft-studio:latest`. It is public. If you have stale GHCR credentials, `docker logout ghcr.io` clears them for this OS user; this also signs out other GHCR pulls using those credentials. Retry and capture the full error if it persists. |
+| Container name already in use | Use `docker start templatecraft-studio` for the existing container, or use a different `--name` for a new one. |
+| Port already allocated | Choose another host port, such as `127.0.0.1:8080:8008`, and open `http://localhost:8080`. |
+| Browser cannot connect | Check `docker ps -a` and `docker logs templatecraft-studio`; wait for startup and confirm your browser is on the Docker host. |
 
 ## Build from source
 
@@ -103,6 +130,8 @@ python3 scripts/generate_sample.py
 
 Requires Python 3.12 and Node.js 22 for the documented release environment.
 
+The following development and validation commands use Bash/Zsh (or WSL on Windows):
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -145,6 +174,8 @@ The default template is the bundled sample. Pass `--template` for another AcroFo
 
 ## Releases and contributions
 
-CI builds the frontend/container and tests the PDF engine, container API and browser workflows. Pushing a `v*` tag publishes versioned AMD64/ARM64 images to GHCR; the maintainer can also run the publishing workflow manually. GitHub Actions authenticate with `GITHUB_TOKEN`; do not put registry tokens in source files. On the first publication, the maintainer must set the GHCR package visibility to **Public** in its package settings so anonymous pulls work.
+CI builds the frontend/container and tests the PDF engine, offline operation, container API and browser workflows. Changes to `main` go through pull requests with passing `test` CI, an up-to-date branch and resolved review conversations. Force pushes and deletion are blocked. Another person's approval is optional so the sole maintainer can merge after CI passes.
+
+Pushing a semantic-version tag such as `v0.1.0` publishes versioned AMD64/ARM64 images to GHCR after validation passes; the maintainer can also run the publishing workflow manually (which publishes `latest`). GitHub Actions authenticate with `GITHUB_TOKEN`; do not put registry tokens in source files. The current package is **Public**. For a new package or fork, verify its visibility in package settings and change it to Public if needed for anonymous pulls.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [THIRD_PARTY.md](THIRD_PARTY.md). Licensed under **AGPL-3.0-only**. PyMuPDF/MuPDF and other dependencies retain their own licenses and notices.
