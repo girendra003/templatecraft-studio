@@ -185,7 +185,9 @@ The default template is the bundled sample. Pass `--template` for another AcroFo
 
 CI builds the frontend/container and tests the PDF engine, offline operation, container API and browser workflows. Changes to `main` go through pull requests with passing `test` CI, an up-to-date branch and resolved review conversations. Force pushes and deletion are blocked. Another person's approval is optional so the sole maintainer can merge after CI passes.
 
-Pushing a semantic-version tag such as `v0.1.0` publishes versioned AMD64/ARM64 images to GHCR after validation passes; the maintainer can also run the publishing workflow manually (which publishes `latest`). GitHub Actions authenticate with `GITHUB_TOKEN`; do not put registry tokens in source files. The current package is **Public**. For a new package or fork, verify its visibility in package settings and change it to Public if needed for anonymous pulls.
+Every push or merged pull request to `main` runs validation and then publishes AMD64/ARM64 images with the `latest` tag. With the Docker Hub credentials configured below, the workflow also mirrors the same image to Docker Hub. Feature branches and pull requests only run CI; they do not publish images. Publishing runs are serialized so active uploads are not interrupted.
+
+Pushing a semantic-version tag such as `v0.1.1` also publishes release and major/minor tags. The maintainer can run the publishing workflow manually to update `latest` for the selected ref; select `main` for the current main-branch image. GitHub Actions authenticate to GHCR with `GITHUB_TOKEN`; do not put registry tokens in source files. The current package is **Public**. For a new package or fork, verify its visibility in package settings and change it to Public if needed for anonymous pulls.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md) and [THIRD_PARTY.md](THIRD_PARTY.md). Licensed under **AGPL-3.0-only**. PyMuPDF/MuPDF and other dependencies retain their own licenses and notices.
 
