@@ -4,7 +4,7 @@
 
 Turn a PDF into an editable template, arrange fields across pages, update document text, place signatures/stamps, preview filled values, and export PDFs or Signzy-compatible JSON.
 
-[Source](https://github.com/girendra003/templatecraft-studio) · [Container images](https://github.com/girendra003/templatecraft-studio/pkgs/container/templatecraft-studio) · [AGPL-3.0 license](LICENSE)
+[Source](https://github.com/girendra003/templatecraft-studio) · [GitHub Container Registry](https://github.com/girendra003/templatecraft-studio/pkgs/container/templatecraft-studio) · [Docker Hub](https://hub.docker.com/r/girendra003/templatecraft-studio) · [AGPL-3.0 license](LICENSE)
 
 ![TemplateCraft Studio landing page](docs/images/landing.png)
 
@@ -67,6 +67,15 @@ The address is local to the Docker host. If Docker runs on another computer or a
 **Save changes updates the active in-memory session. Download your work to keep it.** Sessions do not survive container/server restarts. This is a local/trusted-environment tool, with no authentication or account isolation; do not expose its port directly to the internet. See [deployment notes](SECURITY.md).
 
 ### Docker troubleshooting
+
+The same release is also public on **Docker Hub**, which provides another download source if your network cannot pull from GHCR:
+
+```text
+docker pull girendra003/templatecraft-studio:latest
+docker run --detach --name templatecraft-studio --publish 127.0.0.1:8008:8008 --read-only --tmpfs /tmp:size=128m,mode=1777 --cap-drop ALL --security-opt no-new-privileges:true girendra003/templatecraft-studio:latest
+```
+
+Both registries provide `latest`, `0.1` and `0.1.0` for the first release, with Linux AMD64 and ARM64 support. Open `http://localhost:8008` after startup. If a container with this name already exists, start that container or choose a different name before creating another.
 
 | Message or symptom | What to check |
 | --- | --- |
